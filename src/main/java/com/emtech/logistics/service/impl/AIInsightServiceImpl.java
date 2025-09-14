@@ -7,8 +7,6 @@ import com.emtech.logistics.service.AIInsightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -52,4 +50,3 @@ public class AIInsightServiceImpl implements AIInsightService {
         return metrics;
     }
 }
-s
