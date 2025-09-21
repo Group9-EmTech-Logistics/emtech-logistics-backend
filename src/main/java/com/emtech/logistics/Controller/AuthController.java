@@ -1,42 +1,42 @@
 package com.emtech.logistics.controller;
 
-import com.emtech.logistics.dto.AuthResponse;
-import com.emtech.logistics.dto.LoginRequest;
-import com.emtech.logistics.entity.User;
-import com.emtech.logistics.service.AuthService;
+import com.emtech.logistics.model.User;
+import com.emtech.logistics.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final AuthService authService;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    /**
-     * User login endpoint
-     */
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) throws Exception {
-        AuthResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(response);
+    // ✅ Register Endpoint
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
     }
 
-    /**
-     * User registration endpoint
-     */
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
-        User newUser = authService.register(user);
-        AuthResponse response = new AuthResponse(
-                null,
-                newUser.getEmail(),
-                newUser.getFullName(),
-                newUser.getRole().name()
-        );
-        return ResponseEntity.ok(response);
+    // ✅ Login Endpoint
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+        Optional<User> userOpt = userRepository.findByUsername(loginRequest.getUsername());
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                // ⚡ You can generate JWT here, but for now return success
+                return ResponseEntity.ok("Login successful for user: " + user.getUsername());
+            }
+        }
+        return ResponseEntity.status(401).body("Invalid username or password");
     }
 }

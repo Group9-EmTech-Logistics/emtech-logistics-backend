@@ -17,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * User login endpoint
+     * ✅ User login - returns JWT token + user details
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) throws Exception {
@@ -26,17 +26,11 @@ public class AuthController {
     }
 
     /**
-     * User registration endpoint
+     * ✅ User registration - creates new account and returns response
      */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) {
-        User newUser = authService.register(user);
-        AuthResponse response = new AuthResponse(
-                null,
-                newUser.getEmail(),
-                newUser.getFullName(),
-                newUser.getRole().name()
-        );
+        AuthResponse response = authService.register(user);
         return ResponseEntity.ok(response);
     }
 }

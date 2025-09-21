@@ -20,6 +20,9 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
+    /**
+     * ✅ Login: authenticate user and return JWT + details
+     */
     public AuthResponse login(LoginRequest loginRequest) throws Exception {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
@@ -30,11 +33,28 @@ public class AuthService {
 
         String token = jwtTokenUtil.generateToken(user.getUsername());
 
-        return new AuthResponse(token, user.getEmail(), user.getFullName(), user.getRole().name());
+        return new AuthResponse(
+                token,
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole().name()
+        );
     }
 
-    public User register(User user) {
+    /**
+     * ✅ Register: save new user, encode password, return JWT + details
+     */
+    public AuthResponse register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        String token = jwtTokenUtil.generateToken(savedUser.getUsername());
+
+        return new AuthResponse(
+                token,
+                savedUser.getEmail(),
+                savedUser.getFullName(),
+                savedUser.getRole().name()
+        );
     }
 }
