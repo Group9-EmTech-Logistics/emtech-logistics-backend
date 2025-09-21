@@ -14,11 +14,12 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:3000",                 // ✅ Local development
-                                "https://emtech-logistics.vercel.app"    // ✅ Deployed frontend
+                            "http://localhost:3000",  // local dev
+                            "https://emtech-logistics.vercel.app" // deployed frontend
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
